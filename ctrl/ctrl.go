@@ -14,6 +14,14 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
+//Respond With JSON - already in list of bytes
+func respondWithJSONBytes(w http.ResponseWriter, code int, response []byte) {
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
+
 //Respond With JSON
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
