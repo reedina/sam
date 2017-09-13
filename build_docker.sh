@@ -1,1 +1,1 @@
-docker build -t sam . 
+docker build -t mikerap/sam . 
