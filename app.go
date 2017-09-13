@@ -30,6 +30,7 @@ func (a *App) InitializeRoutes() {
 
 	// Build Request
 	a.Router.HandleFunc("/api/buildRequest/{email}", ctrl.GetBuildRequestProfile).Methods("GET")
+	a.Router.HandleFunc("/api/buildRequest", ctrl.CreateBuild).Methods("POST")
 }
 
 //RunApplication - Start the HTTP server

@@ -8,6 +8,7 @@ import (
 	"net/mail"
 
 	"github.com/gorilla/mux"
+	"github.com/reedina/sam/model"
 )
 
 //GetBuildRequestProfile (GET)
@@ -16,7 +17,7 @@ func GetBuildRequestProfile(w http.ResponseWriter, r *http.Request) {
 	email, err := mail.ParseAddress(vars["email"])
 
 	//Get User and Team
-	getUser := fmt.Sprintf("http://localhost:4040/api/user/%s", email)
+	getUser := fmt.Sprintf("http://spm:4040/api/user/%s", email)
 	user, err := getClientJSON(getUser)
 
 	if err != nil {
@@ -27,7 +28,7 @@ func GetBuildRequestProfile(w http.ResponseWriter, r *http.Request) {
 	//Get Projects
 	teamID := getClientTeamID(user)
 	//teamID := 0
-	getProjects := fmt.Sprintf("http://localhost:4040/api/projects/team/id/%d", teamID)
+	getProjects := fmt.Sprintf("http://spm:4040/api/projects/team/id/%d", teamID)
 	projects, err := getClientJSON(getProjects)
 
 	if err != nil {
@@ -35,7 +36,7 @@ func GetBuildRequestProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Get Environments
-	getEnvironments := "http://localhost:4050/api/environments"
+	getEnvironments := "http://sbm:4050/api/environments"
 	environments, err := getClientJSON(getEnvironments)
 
 	if err != nil {
@@ -50,6 +51,23 @@ func GetBuildRequestProfile(w http.ResponseWriter, r *http.Request) {
 	userProfile := `{"user": ` + user + `, "projects": ` + projects + `, "environments": ` + environments + `}`
 
 	respondWithJSONBytes(w, http.StatusOK, []byte(userProfile))
+}
+
+// CreateBuild (POST)
+func CreateBuild(w http.ResponseWriter, r *http.Request) {
+	jsonData, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := model.CreateBuild(string(jsonData)); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSONBytes(w, http.StatusOK, []byte(jsonData))
 }
 
 func getClientJSON(url string) (string, error) {
